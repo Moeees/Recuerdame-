@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuerdos con mi Novia</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #8A2BE2; /* Lila */
+            --secondary-color: #87CEFA; /* Azul celeste */
+            --background-color: #FFFFFF; /* Cambiado a blanco */
+            --text-color: #1a1a1a; /* Cambiado a un gris más oscuro para mejor contraste */
+            --card-background: #ffffff;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+        }
+        form {
+            background-color: var(--card-background);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-family: inherit;
+            font-weight: 600;
+        }
+        button:hover {
+            background-color: var(--secondary-color);
+            color: var(--text-color); /* Para mejor contraste en hover */
+        }
+        #recuerdos {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        .recuerdo {
+            background-color: var(--card-background);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        .recuerdo:hover {
+            transform: translateY(-5px);
+        }
+        .recuerdo h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+        }
+        .fecha {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 0.5rem;
+        }
+        .recuerdo img {
+            width: 100%;
+            border-radius: 4px;
+            margin-top: 1rem;
+        }
+        .acciones {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 1rem;
+        }
+        .acciones button {
+            font-size: 0.8em;
+            padding: 0.5rem 1rem;
+            margin-left: 0.5rem;
+        }
+        #modalEditar {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-contenido {
+            background-color: var(--card-background);
+            margin: 10% auto;
+            padding: 2rem;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 500px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+        .file-input-wrapper input[type=file] {
+            font-size: 100px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+        }
+        .file-input-wrapper .btn-file-input {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-family: inherit;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .file-input-wrapper .btn-file-input:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 1rem;
+            }
+            form, .modal-contenido {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Recuerdos con mi Novia</h1>
+        <form id="formularioRecuerdo">
+            <input type="date" id="fecha" required>
+            <input type="text" id="titulo" placeholder="Título" required>
+            <textarea id="descripcion" placeholder="Descripción" required></textarea>
+            <div class="file-input-wrapper">
+                <button class="btn-file-input" type="button">Subir Imagen</button>
+                <input type="file" id="imagen" accept="image/*">
+            </div>
+            <button type="submit">Agregar Recuerdo</button>
+        </form>
+        <div id="recuerdos"></div>
+    </div>
+
+    <div id="modalEditar" class="modal">
+        <div class="modal-contenido">
+            <h2>Editar Recuerdo</h2>
+            <form id="formularioEditar">
+                <input type="date" id="editarFecha" required>
+                <input type="text" id="editarTitulo" placeholder="Título" required>
+                <textarea id="editarDescripcion" placeholder="Descripción" required></textarea>
+                <div class="file-input-wrapper">
+                    <button class="btn-file-input" type="button">Cambiar Imagen</button>
+                    <input type="file" id="editarImagen" accept="image/*">
+                </div>
+                <button type="submit">Guardar Cambios</button>
+                <button type="button" id="cancelarEdicion">Cancelar</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // El script JavaScript permanece sin cambios
+        let recuerdoEditandoId = null;
+
+        function cargarRecuerdos() {
+            const recuerdosGuardados = localStorage.getItem('recuerdos');
+            return recuerdosGuardados ? JSON.parse(recuerdosGuardados) : [];
+        }
+
+        function guardarRecuerdos(recuerdos) {
+            localStorage.setItem('recuerdos', JSON.stringify(recuerdos));
+        }
+
+        function mostrarRecuerdos() {
+            const recuerdos = cargarRecuerdos();
+            const contenedorRecuerdos = document.getElementById('recuerdos');
+            contenedorRecuerdos.innerHTML = '';
+
+            recuerdos.forEach((recuerdo, index) => {
+                const elementoRecuerdo = document.createElement('div');
+                elementoRecuerdo.className = 'recuerdo';
+                elementoRecuerdo.innerHTML = `
+                    <h3>${recuerdo.titulo}</h3>
+                    <p class="fecha">${recuerdo.fecha}</p>
+                    <p>${recuerdo.descripcion}</p>
+                    ${recuerdo.imagen ? `<img src="${recuerdo.imagen}" alt="Imagen del recuerdo">` : ''}
+                    <div class="acciones">
+                        <button onclick="editarRecuerdo(${index})">Editar</button>
+                        <button onclick="borrarRecuerdo(${index})">Borrar</button>
+                    </div>
+                `;
+                contenedorRecuerdos.appendChild(elementoRecuerdo);
+            });
+        }
+
+        function imagenABase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        document.getElementById('formularioRecuerdo').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const fecha = document.getElementById('fecha').value;
+            const titulo = document.getElementById('titulo').value;
+            const descripcion = document.getElementById('descripcion').value;
+            const imagenFile = document.getElementById('imagen').files[0];
+
+            let imagen = null;
+            if (imagenFile) {
+                imagen = await imagenABase64(imagenFile);
+            }
+
+            const nuevoRecuerdo = { fecha, titulo, descripcion, imagen };
+            const recuerdos = cargarRecuerdos();
+            recuerdos.push(nuevoRecuerdo);
+            guardarRecuerdos(recuerdos);
+
+            this.reset();
+            mostrarRecuerdos();
+        });
+
+        function borrarRecuerdo(index) {
+            const recuerdos = cargarRecuerdos();
+            recuerdos.splice(index, 1);
+            guardarRecuerdos(recuerdos);
+            mostrarRecuerdos();
+        }
+
+        function editarRecuerdo(index) {
+            const recuerdos = cargarRecuerdos();
+            const recuerdo = recuerdos[index];
+            recuerdoEditandoId = index;
+
+            document.getElementById('editarFecha').value = recuerdo.fecha;
+            document.getElementById('editarTitulo').value = recuerdo.titulo;
+            document.getElementById('editarDescripcion').value = recuerdo.descripcion;
+
+            document.getElementById('modalEditar').style.display = 'block';
+        }
+
+        document.getElementById('formularioEditar').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const recuerdos = cargarRecuerdos();
+            const imagenFile = document.getElementById('editarImagen').files[0];
+
+            let imagen = recuerdos[recuerdoEditandoId].imagen;
+            if (imagenFile) {
+                imagen = await imagenABase64(imagenFile);
+            }
+
+            recuerdos[recuerdoEditandoId] = {
+                fecha: document.getElementById('editarFecha').value,
+                titulo: document.getElementById('editarTitulo').value,
+                descripcion: document.getElementById('editarDescripcion').value,
+                imagen: imagen
+            };
+
+            guardarRecuerdos(recuerdos);
+            document.getElementById('modalEditar').style.display = 'none';
+            mostrarRecuerdos();
+        });
+
+        document.getElementById('cancelarEdicion').addEventListener('click', function() {
+            document.getElementById('modalEditar').style.display = 'none';
+        });
+
+        mostrarRecuerdos();
+    </script>
+</body>
+</html>
